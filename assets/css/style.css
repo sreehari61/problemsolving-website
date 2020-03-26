@@ -1,52 +1,88 @@
-
-body{
-    background-color: #fafafa;
+::-webkit-scrollbar {
+    width: 8px;
+    height:8px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px white; 
+    border-radius: 10px;
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: lightgray; 
+    border-radius: 10px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background:gray; 
+  }
+  textarea {
+    overflow: scroll;
+    height: 100px;
+    resize: none; /* Remove this if you want the user to resize the textarea */
 }
-
-.editor{
-    position: relative;
-}
-
-.editor-inner{
-    border:1px solid black;
-    padding-top:10px;
-}
-
-textarea{
-    border:1px solid black;
-    resize: none;
+.panel-container {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid silver;
+    overflow: hidden;
+    
+    /* avoid browser level touch actions */
+    xtouch-action: none;
+  }
+  
+  .panel-left {
+    flex: 0 0 auto;
+    /* only manually resize */
     padding: 10px;
-}
-
-.output{
+    width: 300px;
+    height: calc(100vh - 30px);
+    min-width: 100px;
+    white-space: nowrap;
+    background: #ffffff;
+    overflow-y: scroll;
+  }
+  
+  .splitter {
+    flex: 0 0 auto;
+    width: 10px;  
+    background-color: #fafafa;
+    min-height: 200px;
+    cursor: col-resize;  
+  }
+  
+  .panel-right {
     position: relative;
-    /* background-color: #1e1e1e; */
-    width:33%;
-    height:450px;
-    display: inline-block;
-    padding-top:40px;
-    color:black;
-}
+    flex: 1 1 auto;
+    /* resizable */
+    width: 100%;
+    min-height: 200px;
+    min-width: 200px;
+    max-height: calc(100vh - 20px);
+    background: #ffffff;
+  }
+  
 
-.output::before{
-    content:'Output';
-    position: absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:30px;
-    color:black;
-    text-align: center;
-    line-height: 30px;
-    border-bottom: 1px solid black;
-}
+  .run{
+    border:1px solid gray;
+    background-color: white;
+    border-radius: 3px;
+    /* float: right; */
+    padding:5px 10px;
+  }
 
-select{
-    position: absolute;
+  .run:hover{
+    background-color: lightgray;
+  }
+
+  .outputarea{
     z-index: 999;
-    top:0px;
-    right:0px;
-    height: 30px;
-    padding-left:10px;
-    padding-right:10px;
-}
+    position: absolute;
+    width:100%;
+    height:30%;
+    bottom:60px;
+    left:0;
+  }
