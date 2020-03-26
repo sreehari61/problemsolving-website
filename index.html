@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="codemirror-5.52.2/lib/codemirror.css">
+    <link rel="stylesheet" href="codemirror-5.52.2/theme/darcula.css">
+    <link rel="stylesheet" href="codemirror-5.52.2/addon/hint/show-hint.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+
+
+    <script src="codemirror-5.52.2/lib/codemirror.js"></script>
+    <script src="codemirror-5.52.2/mode/xml/xml.js"></script>
+    <!-- <script src="https://cloud.tinymce.com/4/tinymce.min.js?apiKey=qagffr3pkuv17a8on1afax661irst1hbr4e6tbv888sz91jc"></script> -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="codemirror-5.52.2/addon/hint/show-hint.js"></script>
+    <script src="codemirror-5.52.2/addon/hint/css-hint.js"></script>
+</head>
+<body style="padding: 10px;">
+
+
+    <div class="main">
+        <div class="editor">
+            <div class="editor-inner">
+                <select id="langselect">
+                    <option>Select Language</option>
+                </select><br>
+                <div class="editor-main">
+                    <textarea style="width: 70%;height:500px;padding:10px" id="textarea"></textarea>
+                    <div class="output">
+                        <textarea style="width: 100%; height: 100%;" class="outputarea" readonly></textarea>
+                    </div>
+                    
+                    <!-- <div class="output"></div> -->
+                </div>
+                
+            </div>
+            <br><center><button>Run</button></center>
+        </div>
+    </div>
+
+
+    
+    <script src="assets/js/texteditor.js"></script>
+    <script>
+        var editor
+        var langid
+        $(document).ready(()=>{
+            $.ajax({
+                url:'https://api.judge0.com/languages/',
+                method:'GET',
+                success:(res)=>{
+                    console.log(res)
+                    res.forEach((item)=>{
+                        $('#langselect').append(`<option value="${item.id}">${item.name}</option>`);
+                    })
+                }
+            })
+            var myTextarea = document.getElementById('textarea') 
+            editor = CodeMirror.fromTextArea(myTextarea, {
+                lineNumbers: true,
+                // theme:"darcula",
+                extraKeys:{'Ctrl':'autocomplete'}
+            });
+        })
+        
+
+        $('#langselect').change(()=>{
+            langid = $('#langselect').children("option:selected").val();
+            code(langid)
+            // console.log(a)
+        })
+        $('button').on('click',(e)=>{
+            $('.outputarea').val('')
+            e.preventDefault()
+            console.log(editor.getValue() )
+            var b64 = btoa(editor.getValue());
+            console.log(b64)
+            $.ajax({
+                url:'https://api.judge0.com/submissions?base64_encoded=true&wait=false',
+                method:'POST',
+                ContentType: 'application/json',
+                data:{"source_code": b64,"language_id": parseInt(langid)},
+                success:(res)=>{
+                    console.log(res)
+                    console.log(res.token)
+                    setTimeout(()=>{
+                        $.ajax({
+                            url:`https://api.judge0.com/submissions/${res.token}?base64_encoded=true`,
+                            method:'GET',
+                            ContentType: 'application/json',
+                            success:(res)=>{
+                                console.log(atob(res.stdout).split("\n"))
+                                var temp = ''
+                                atob(res.stdout).split("\n").forEach((line)=>{
+                                    temp+= `> ${line}\n`
+                                })
+                                $('.outputarea').val(temp)
+                            }
+                        })
+                    },1000)
+                }
+            })
+        })
+    </script>
+    
+
+</body>
+</html>
